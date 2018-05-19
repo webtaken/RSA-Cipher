@@ -1,0 +1,79 @@
+#include <iostream>
+#include <vector>
+#include <time.h>
+#include <stdlib.h>
+using namespace std;
+
+string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ.,-_()abcdefghijklmnopqrstuvwxyz 0123456789";
+const int Num = 10000;
+vector <int> primes;
+vector <bool> sieve(Num , 1);
+
+int modulo(int a , int b){
+  return (a - b * (a / b)) + ((a - b * (a / b) < 0) * b);
+}
+
+int find(char a){
+  int i = 0 , size = alphabet.size();
+  while(i < size && alphabet[i] != a)
+    i++;
+  return i;
+}
+
+int expo(int base , int exp , int m){
+  int x = modulo(base , m);
+  int n = 1;
+  while(exp != 0){
+    if(exp % 2)
+      n = modulo(n * x , m);
+    x = modulo(x * x , m);
+    exp /= 2;
+  }
+  return n;
+}
+
+void generate_sieve(){
+  int i , j;
+  for(i = 2; i * i < Num; i++)
+    if(sieve[i]){
+      for(j = i + i; j < Num; j += i)
+	sieve[j] = 0;
+    }
+  for(i = 2; i < sieve.size(); i++){
+    if(sieve[i])
+      primes.push_back(i);
+  }
+}
+
+int get_random_prime(int n){
+  return primes[n - 1];
+}
+
+int GCD(int a , int b){
+  int tmp = 0;
+  while (b > 0) {
+    tmp = a;
+    a = b;
+    b = modulo(tmp , b);
+  }
+  return a;// gcd(a , b) 
+}
+
+int modular_inverse(int a , int b) {
+  int s_1 = 1, s_2 = 0 , b_c = b;
+  int q = 0, r = 0, s = 0;
+  while (b > 0) {
+    q = a / b;
+
+    r = a - q * b;
+    a = b;
+    b = r;
+    
+    s = s_1 - q * s_2;
+    s_1 = s_2;
+    s_2 = s;
+  }
+  if(s_1 < 0)
+    s_1 += b_c;
+  return s_1;// a*s mod b = 1
+}
